@@ -2,3 +2,7 @@ spring:
   data:
     mongodb:
       database: local
+
+api:
+  baseUrl: http://api.pathofexile.com
+  publicStashTabs: /public-stash-tabs
