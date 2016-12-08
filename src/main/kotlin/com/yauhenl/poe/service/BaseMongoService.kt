@@ -12,16 +12,8 @@ import jdk.nashorn.internal.objects.NativeArray.forEach
 import java.util.*
 import java.util.function.Consumer
 
-
-
-
-
-
 abstract class BaseMongoService(mongoDatabase: MongoDatabase, mongoCollectionName: String) {
     protected var mongoCollection: MongoCollection<Document>
-
-    open fun initCollection() {
-    }
 
     fun drop() = mongoCollection.drop()
 
@@ -43,7 +35,7 @@ abstract class BaseMongoService(mongoDatabase: MongoDatabase, mongoCollectionNam
 
     fun findFirstByProperty(key: String, value: Any) = mongoCollection.find(eq(key, value)).first()
 
-    fun find() = mongoCollection.find()
+    fun find() = mongoCollection.find().toList()
 
     fun count() = mongoCollection.count()
 
@@ -51,8 +43,5 @@ abstract class BaseMongoService(mongoDatabase: MongoDatabase, mongoCollectionNam
 
     init {
         mongoCollection = mongoDatabase.getCollection(mongoCollectionName)
-        if (mongoCollection.count().equals(0)) {
-            initCollection()
-        }
     }
 }
