@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      database: local
+      database: poe
 
 api:
   baseUrl: http://api.pathofexile.com

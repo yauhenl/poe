@@ -26,11 +26,12 @@ class ApiService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabase,
         if ("" != nextChangeId) {
             url += "/?id=" + nextChangeId
         }
-        val data = Document.parse(get(url).text)
+        val getResult = get(url, headers = mapOf(pair = Pair("Content-Encoding", "gzip"))).text
+        val data = Document.parse(getResult)
         log.info(getNextChangeId(data))
         setNextChangeId(nextChangeIdData, getNextChangeId(data))
         replaceOne(nextChangeIdData)
-        return getStashes(data) as List<Document>
+        return getStashes(data)
     }
 
     fun findNextChangeId() = mongoCollection.find(exists("next_change_id")).first()
@@ -38,7 +39,8 @@ class ApiService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabase,
     fun getNextChangeId(data: Document) = data.getString("next_change_id")
     fun setNextChangeId(data: Document, value: String) = data.put("next_change_id", value)
 
-    fun getStashes(data: Document) = data.get("stashes", List::class.java)
+    @Suppress("UNCHECKED_CAST")
+    fun getStashes(data: Document) = data.get("stashes", List::class.java) as List<Document>
 
     init {
         if (mongoCollection.count().toInt() == 0) {

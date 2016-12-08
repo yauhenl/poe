@@ -5,9 +5,10 @@ import org.bson.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.util.*
 
 @Service
 class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabase, "stash") {
@@ -18,21 +19,39 @@ class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabas
 
     @Scheduled(cron = "*/5 * * * * *")
     fun updateStashes() {
-        log.info("updateStashes start" + LocalDateTime.now().toString())
         val stashes = apiService?.getPublicStashTabs()
         if (stashes != null) {
-            val toSave = stashes.filter { it ->
-                isPublic(it) && !getItems(it).isEmpty()
+            val toSave = prepareToSave(stashes)
+            if (toSave.isNotEmpty()) {
+                log.info(toSave.size.toString())
+                insertMany(toSave)
             }
-            log.info(toSave.size.toString())
-            insertMany(toSave)
         }
-        log.info("updateStashes end" + LocalDateTime.now().toString())
+        log.info("============================================")
+    }
+
+    fun prepareToSave(stashes: List<Document>): List<Document> {
+        val result = ArrayList<Document>()
+        for (stash in stashes) {
+            if (isPublic(stash)) {
+                val items = getItems(stash)
+                val verifiedItems = items.filter { it -> isVerified(it) }
+                if (verifiedItems.isNotEmpty()) {
+                    setItems(stash, verifiedItems)
+                    result.add(stash)
+                }
+            }
+        }
+        return result
     }
 
     fun isPublic(stash: Document) = stash.getBoolean("public")
 
-    fun getItems(stash: Document) = stash.get("items", List::class.java)
+    @Suppress("UNCHECKED_CAST")
+    fun getItems(stash: Document) = stash.get("items", List::class.java) as List<Document>
+    fun setItems(stash: Document, items: List<Document>) = stash.put("items", items)
+
+    fun isVerified(item: Document) = item.getBoolean("verified")
 
     init {
         if (mongoCollection.count().toInt() == 0) {
