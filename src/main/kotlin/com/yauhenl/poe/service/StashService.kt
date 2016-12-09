@@ -1,6 +1,7 @@
 package com.yauhenl.poe.service
 
 import com.mongodb.client.MongoDatabase
+import com.mongodb.client.model.IndexOptions
 import org.bson.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -55,7 +56,7 @@ class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabas
 
     init {
         if (mongoCollection.count().toInt() == 0) {
-            mongoCollection.createIndex(Document("id", 1).append("unique", true))
+            mongoCollection.createIndex(Document("id", 1), IndexOptions().unique(true))
         }
     }
 }
