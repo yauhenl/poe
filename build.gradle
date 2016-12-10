@@ -27,6 +27,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    compile 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
     compile 'org.springframework.boot:spring-boot-devtools'
     compile 'com.github.jkcclemens:khttp:0.1.0'
 }

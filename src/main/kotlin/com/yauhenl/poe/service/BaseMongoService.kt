@@ -6,11 +6,6 @@ import com.mongodb.client.model.Filters.`in`
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.UpdateOptions
 import org.bson.Document
-import com.sun.xml.internal.ws.model.RuntimeModeler.getNamespace
-import java.util.stream.Collectors
-import jdk.nashorn.internal.objects.NativeArray.forEach
-import java.util.*
-import java.util.function.Consumer
 
 abstract class BaseMongoService(mongoDatabase: MongoDatabase, mongoCollectionName: String) {
     protected var mongoCollection: MongoCollection<Document>

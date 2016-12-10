@@ -1,0 +1,33 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1,
+      "analysis": {
+        "analyzer": {
+          "poe_analyzer": {
+          }
+        }
+      }
+    }
+  },
+  "mappings": {
+    "stash": {
+      "_all" : {
+        "analyzer" : "english"
+      },
+      "properties": {
+        "id": {
+          "type": "string",
+          "analyzer" : "english",
+          "fields": {
+            "raw": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        }
+      }
+    }
+  }
+}

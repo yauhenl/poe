@@ -4,7 +4,6 @@ import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.IndexOptions
 import com.mongodb.client.model.UpdateOptions
-import com.mongodb.client.result.UpdateResult
 import org.bson.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -22,7 +21,7 @@ class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabas
 
     override fun replaceOne(document: Document) = mongoCollection.replaceOne(Filters.eq("id", getId(document)), document, UpdateOptions().upsert(true))
 
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "0/5 * * * * *")
     fun updateStashes() {
         val stashes = apiService?.getPublicStashTabs()
         if (stashes != null) {

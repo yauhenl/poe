@@ -28,6 +28,10 @@ class ApiService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabase,
         }
         val getResult = get(url, headers = mapOf(pair = Pair("Content-Encoding", "gzip"))).text
         val data = Document.parse(getResult)
+        if (getError(data) != null) {
+            log.error("get error", data.toJson())
+            return listOf(Document())
+        }
         log.info(getNextChangeId(data))
         setNextChangeId(nextChangeIdData, getNextChangeId(data))
         replaceOne(nextChangeIdData)
@@ -38,6 +42,8 @@ class ApiService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabase,
 
     fun getNextChangeId(data: Document) = data.getString("next_change_id")
     fun setNextChangeId(data: Document, value: String) = data.put("next_change_id", value)
+
+    fun getError(data: Document) = data.get("error", Document::class.java)
 
     @Suppress("UNCHECKED_CAST")
     fun getStashes(data: Document) = data.get("stashes", List::class.java) as List<Document>
