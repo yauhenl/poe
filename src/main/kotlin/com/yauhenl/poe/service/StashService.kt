@@ -1,12 +1,14 @@
 package com.yauhenl.poe.service
 
 import com.mongodb.client.MongoDatabase
+import com.mongodb.client.model.Filters
 import com.mongodb.client.model.IndexOptions
+import com.mongodb.client.model.UpdateOptions
+import com.mongodb.client.result.UpdateResult
 import org.bson.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.*
@@ -18,15 +20,25 @@ class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabas
     @Autowired
     private val apiService: ApiService? = null
 
+    override fun replaceOne(document: Document) = mongoCollection.replaceOne(Filters.eq("id", getId(document)), document, UpdateOptions().upsert(true))
+
     @Scheduled(cron = "*/5 * * * * *")
     fun updateStashes() {
         val stashes = apiService?.getPublicStashTabs()
         if (stashes != null) {
-            val toSave = prepareToSave(stashes)
-            if (toSave.isNotEmpty()) {
-                log.info(toSave.size.toString())
-                insertMany(toSave)
+            stashes.filter { it -> isPublic(it) && getItems(it).isNotEmpty() }.forEach { it ->
+                val stash = findFirstByProperty("id", getId(it))
+                if (stash == null) {
+                    insertOne(it)
+                } else {
+                    replaceOne(it)
+                }
             }
+//            val toSave = prepareToSave(stashes)
+//            if (toSave.isNotEmpty()) {
+//                log.info(toSave.size.toString())
+//                insertMany(toSave)
+//            }
         }
         log.info("============================================")
     }
@@ -50,7 +62,10 @@ class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabas
 
     @Suppress("UNCHECKED_CAST")
     fun getItems(stash: Document) = stash.get("items", List::class.java) as List<Document>
+
     fun setItems(stash: Document, items: List<Document>) = stash.put("items", items)
+
+    fun getId(stash: Document) = stash.getString("id")
 
     fun isVerified(item: Document) = item.getBoolean("verified")
 

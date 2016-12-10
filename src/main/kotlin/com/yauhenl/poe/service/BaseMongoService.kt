@@ -21,7 +21,7 @@ abstract class BaseMongoService(mongoDatabase: MongoDatabase, mongoCollectionNam
 
     fun insertMany(documents: List<Document>) = mongoCollection.insertMany(documents)
 
-    fun replaceOne(document: Document) = mongoCollection.replaceOne(eq("_id", document["_id"]), document, UpdateOptions().upsert(true))
+    open fun replaceOne(document: Document) = mongoCollection.replaceOne(eq("_id", document["_id"]), document, UpdateOptions().upsert(true))
 
     fun deleteOne(document: Document) = mongoCollection.deleteOne(document)
 
