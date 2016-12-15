@@ -15,6 +15,7 @@ import java.util.*
 @Service
 class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabase, "stash") {
     private val log: Logger = LoggerFactory.getLogger(StashService::class.java)
+    private val stashIds = ArrayList<String>()
 
     @Autowired
     private val apiService: ApiService? = null
@@ -26,11 +27,12 @@ class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabas
         val stashes = apiService?.getPublicStashTabs()
         if (stashes != null) {
             stashes.filter { it -> isPublic(it) && getItems(it).isNotEmpty() }.forEach { it ->
-                val stash = findFirstByProperty("id", getId(it))
-                if (stash == null) {
-                    insertOne(it)
-                } else {
+                val id = getId(it)
+                if (stashIds.contains(id)) {
                     replaceOne(it)
+                } else {
+                    insertOne(it)
+                    stashIds.add(id)
                 }
             }
 //            val toSave = prepareToSave(stashes)
@@ -72,5 +74,6 @@ class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabas
         if (mongoCollection.count().toInt() == 0) {
             mongoCollection.createIndex(Document("id", 1), IndexOptions().unique(true))
         }
+        mongoCollection.find().forEach { it -> stashIds.add(getId(it)) }
     }
 }
