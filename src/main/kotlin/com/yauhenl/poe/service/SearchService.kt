@@ -9,13 +9,14 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 @Service
-class SearchService {
+open class SearchService {
     val logger: Logger = LoggerFactory.getLogger(SearchService::class.java)
     val stashType = "stash"
 
@@ -28,7 +29,8 @@ class SearchService {
     @Autowired
     val stashService: StashService? = null
 
-    @Scheduled(cron = "0 0/15 * * * *")
+    @Scheduled(fixedRate = 15 * 60 * 1000)
+//    @Async
     fun reindexStashes() {
         val newIndexName = "$indexAliasName-${System.currentTimeMillis()}"
         logger.info(newIndexName)

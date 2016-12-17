@@ -11,11 +11,12 @@ import org.bson.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
-class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabase, "stash") {
+open class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabase, "stash") {
     private val log: Logger = LoggerFactory.getLogger(StashService::class.java)
 
     @Autowired
@@ -23,7 +24,8 @@ class StashService(mongoDatabase: MongoDatabase) : BaseMongoService(mongoDatabas
 
     override fun replaceOne(document: Document) = mongoCollection.replaceOne(Filters.eq("id", getId(document)), document, UpdateOptions().upsert(true))
 
-    @Scheduled(cron = "0/5 * * * * *")
+    @Scheduled(fixedRate = 5000)
+//    @Async
     fun updateStashes() {
         apiService?.getPublicStashTabs()?.forEach { it ->
             val stash = findFirstByProperty("id", getId(it))
