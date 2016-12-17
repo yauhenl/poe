@@ -1,15 +1,23 @@
 package com.yauhenl.poe.service
 
-import com.google.common.io.ByteStreams
+import com.yauhenl.poe.domain.Stash.getAccountName
+import com.yauhenl.poe.domain.Stash.getId
+import com.yauhenl.poe.domain.Stash.getLastCharacterName
+import org.bson.Document
 import org.elasticsearch.client.Client
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 @Service
 class SearchService {
-    val stash = "stash"
+    val logger: Logger = LoggerFactory.getLogger(SearchService::class.java)
+    val stashType = "stash"
 
     @Value("\${spring.data.elasticsearch.indexAlias}")
     private val indexAliasName: String? = null
@@ -17,18 +25,20 @@ class SearchService {
     @Autowired
     var elasticSearchClient: Client? = null
 
+    @Autowired
+    val stashService: StashService? = null
+
     @Scheduled(cron = "0 0/15 * * * *")
     fun reindexStashes() {
         val newIndexName = "$indexAliasName-${System.currentTimeMillis()}"
+        logger.info(newIndexName)
         createIndex(newIndexName)
         processStashes(newIndexName)
         createOrSwitchAlias(indexAliasName!!, newIndexName)
     }
 
     private fun createIndex(indexName: String) {
-        elasticSearchClient?.admin()?.indices()?.prepareCreate(indexName)
-                ?.setSource(ByteStreams.toByteArray(javaClass.classLoader.getResourceAsStream("es_index_source.json")))
-                ?.execute()?.actionGet()
+        elasticSearchClient?.admin()?.indices()?.prepareCreate(indexName)?.execute()?.actionGet()
     }
 
     private fun createOrSwitchAlias(aliasName: String, indexName: String) {
@@ -37,9 +47,9 @@ class SearchService {
         val aliases = indices.prepareAliases()
         if (aliasExists) {
             indices.prepareGetAliases(aliasName)?.execute()?.actionGet()?.aliases?.forEach { cursor ->
-                val key = cursor.key
-                val value = cursor.value
-                value.forEach { aliasMetaData -> aliases?.removeAlias(key, aliasMetaData.alias()) }
+                cursor.value.forEach { aliasMetaData ->
+                    aliases?.removeAlias(cursor.key, aliasMetaData.alias())
+                }
             }
         }
         aliases?.addAlias(indexName, aliasName)
@@ -47,6 +57,16 @@ class SearchService {
     }
 
     private fun processStashes(indexName: String) {
+        stashService?.find()?.forEach { stash ->
+            elasticSearchClient?.prepareIndex(indexName, stashType, getId(stash))?.setSource(processStash(stash))?.execute()?.actionGet(5, TimeUnit.SECONDS)
+        }
+    }
 
+    private fun processStash(stash: Document): HashMap<String, Any> {
+        val result = HashMap<String, Any>()
+        result.put("id", getId(stash))
+        result.put("accountName", getAccountName(stash))
+        result.put("lastCharacterName", getLastCharacterName(stash))
+        return result
     }
 }

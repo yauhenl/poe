@@ -30,7 +30,7 @@ abstract class BaseMongoService(mongoDatabase: MongoDatabase, mongoCollectionNam
 
     fun findFirstByProperty(key: String, value: Any) = mongoCollection.find(eq(key, value)).first()
 
-    fun find() = mongoCollection.find().toList()
+    fun find() = mongoCollection.find()
 
     fun count() = mongoCollection.count()
 

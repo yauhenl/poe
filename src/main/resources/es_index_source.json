@@ -2,7 +2,7 @@
   "settings": {
     "index": {
       "number_of_shards": 1,
-      "number_of_replicas": 1,
+      "number_of_replicas": 5,
       "analysis": {
         "analyzer": {
           "poe_analyzer": {
@@ -17,9 +17,11 @@
         "analyzer" : "english"
       },
       "properties": {
+        "_id": {
+          "index": "not_analyzed"
+        },
         "id": {
           "type": "string",
-          "analyzer" : "english",
           "fields": {
             "raw": {
               "type": "string",
