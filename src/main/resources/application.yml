@@ -2,6 +2,7 @@ spring:
   data:
     mongodb:
       database: poe
+      uri: mongodb://localhost:27017/?maxPoolSize=100
     elasticsearch:
       indexAlias: newstash
 
