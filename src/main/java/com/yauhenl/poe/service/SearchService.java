@@ -4,13 +4,18 @@ import org.bson.Document;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.AliasMetaData;
+import org.elasticsearch.common.bytes.BytesArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +32,9 @@ public class SearchService {
     @Value("${spring.data.elasticsearch.indexAlias}")
     private String indexAliasName;
 
+    @Value("classpath:es_index_source.json")
+    private Resource indexMapping;
+
     @Autowired
     private Client elasticSearchClient;
 
@@ -34,7 +42,7 @@ public class SearchService {
     private StashService stashService;
 
     @Async
-    public void reindexProducts() {
+    public void reindexProducts() throws IOException {
         logger.info(elasticSearchClient.toString());
         String newIndexName = String.format("newproduct-%d", System.currentTimeMillis());
         createIndex(newIndexName);
@@ -42,8 +50,8 @@ public class SearchService {
         createOrSwitchAlias(indexAliasName, newIndexName);
     }
 
-    private void createIndex(String indexName) {
-        elasticSearchClient.admin().indices().prepareCreate(indexName).execute().actionGet();
+    private void createIndex(String indexName) throws IOException {
+        elasticSearchClient.admin().indices().prepareCreate(indexName).setSource(StreamUtils.copyToByteArray(indexMapping.getInputStream())).execute().actionGet();
     }
 
     private void createOrSwitchAlias(String aliasName, String indexName) {
