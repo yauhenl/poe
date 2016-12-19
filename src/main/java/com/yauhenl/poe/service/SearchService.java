@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 import static com.yauhenl.poe.domain.Stash.*;
 
@@ -74,7 +75,7 @@ public class SearchService {
 
     private void processStashes(String indexName) {
         final AtomicLong counter = new AtomicLong(0);
-        stashService.findIds().parallelStream().forEach(id -> {
+        stashService.find().forEach((Consumer<Document>) id -> {
             long c = counter.addAndGet(1);
             Document stash = stashService.findById(getId(id));
             if (stash != null) {

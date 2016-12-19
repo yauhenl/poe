@@ -13,21 +13,12 @@
   },
   "mappings": {
     "stash": {
-      "_all" : {
-        "analyzer" : "english"
+      "_all": {
+        "enabled": false
       },
       "properties": {
-        "_id": {
-          "index": "not_analyzed"
-        },
         "id": {
-          "type": "string",
-          "fields": {
-            "raw": {
-              "type": "string",
-              "index": "not_analyzed"
-            }
-          }
+          "type": "string"
         }
       }
     }

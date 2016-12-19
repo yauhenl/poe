@@ -20,9 +20,6 @@ public class ApiService extends BaseMongoService {
     private static final Logger logger = LoggerFactory.getLogger(ApiService.class);
     private static final String collectionName = "apiData";
 
-    @Value("${api.baseUrl}")
-    private String baseUrl;
-
     @Value("${api.publicStashTabs}")
     private String publicStashTabs;
 
@@ -37,7 +34,7 @@ public class ApiService extends BaseMongoService {
     }
 
     public List<Document> getPublicStashTabs() {
-        String url = baseUrl + publicStashTabs;
+        String url = publicStashTabs;
         Document nextChangeIdData = findNextChangeId();
         String nextChangeId = getNextChangeId(nextChangeIdData);
         if (!"".equals(nextChangeId)) {

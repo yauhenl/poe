@@ -7,5 +7,7 @@ spring:
       indexAlias: newstash
 
 api:
-  baseUrl: http://api.pathofexile.com
-  publicStashTabs: /public-stash-tabs
+  publicStashTabs: http://api.pathofexile.com/public-stash-tabs
+  characters: https://www.pathofexile.com/character-window/get-characters?&accountName=[AccountName]
+  items: https://www.pathofexile.com/character-window/get-items?character=[Charname]&accountName=[AccountName]
+  passiveSkills: https://www.pathofexile.com/character-window/get-passive-skills?character=[Charname]&accountName=[AccountName]

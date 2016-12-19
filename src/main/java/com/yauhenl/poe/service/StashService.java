@@ -1,9 +1,8 @@
 package com.yauhenl.poe.service;
 
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Projections;
-import com.mongodb.client.model.UpdateOptions;
+import static com.mongodb.client.model.Filters.eq;
+import static com.yauhenl.poe.domain.Stash.*;
+
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,10 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-import static com.mongodb.client.model.Filters.eq;
-import static com.yauhenl.poe.domain.Stash.*;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.UpdateOptions;
 
 @Service
 public class StashService extends BaseMongoService {
@@ -37,14 +35,6 @@ public class StashService extends BaseMongoService {
     @Override
     public void replaceOne(Document document) {
         mongoCollection.replaceOne(eq("id", getId(document)), document, new UpdateOptions().upsert(true));
-    }
-
-    public List<Document> findIds() {
-        return consumeToList(mongoCollection.find().projection(Projections.include("id")));
-    }
-
-    public Document findById(String id) {
-        return findFirstByProperty("id", id);
     }
 
     @Async
