@@ -11,7 +11,7 @@ public class UpdateStashesJob {
     @Autowired
     private StashService stashService;
 
-    @Scheduled(fixedRate = 5000)
+//    @Scheduled(fixedRate = 5000)
     public void updateStashes() {
         stashService.updateStashes();
     }

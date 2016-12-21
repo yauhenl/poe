@@ -4,26 +4,22 @@ import org.bson.Document;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.AliasMetaData;
-import org.elasticsearch.common.bytes.BytesArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-import static com.yauhenl.poe.domain.Stash.*;
+import static com.yauhenl.poe.domain.Stash.getId;
 
 @Service
 public class SearchService {
@@ -75,11 +71,12 @@ public class SearchService {
 
     private void processStashes(String indexName) {
         final AtomicLong counter = new AtomicLong(0);
-        stashService.find().forEach((Consumer<Document>) id -> {
+        stashService.find().forEach((Consumer<Document>) stash -> {
             long c = counter.addAndGet(1);
-            Document stash = stashService.findById(getId(id));
-            if (stash != null) {
+            try {
                 elasticSearchClient.prepareIndex(indexName, stashType, getId(stash)).setSource(processStash(stash)).execute().actionGet(5, TimeUnit.SECONDS);
+            } catch (IllegalArgumentException e) {
+                logger.error("Mapping error " + stash.toJson(), e);
             }
             if (c % 1000 == 0) {
                 logger.info("index {} - {} processed", indexName, c);
@@ -87,11 +84,8 @@ public class SearchService {
         });
     }
 
-    private Map<String, Object> processStash(Document stash) {
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", getId(stash));
-        result.put("accountName", getAccountName(stash));
-        result.put("lastCharacterName", getLastCharacterName(stash));
-        return result;
+    private Document processStash(Document stash) {
+        stash.remove("_id");
+        return stash;
     }
 }

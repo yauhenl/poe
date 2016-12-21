@@ -1,8 +1,8 @@
 {
   "settings": {
     "index": {
-      "number_of_shards": 1,
-      "number_of_replicas": 5,
+      "number_of_shards": 4,
+      "number_of_replicas": 1,
       "analysis": {
         "analyzer": {
           "poe_analyzer": {
@@ -17,8 +17,302 @@
         "enabled": false
       },
       "properties": {
+        "accountName": {
+          "type": "text"
+        },
+        "lastCharacterName": {
+          "type": "text"
+        },
         "id": {
-          "type": "string"
+          "type": "text"
+        },
+        "stash": {
+          "type": "text"
+        },
+        "stashType": {
+          "type": "text"
+        },
+        "items": {
+          "properties": {
+            "verified": {
+              "type": "boolean"
+            },
+            "w": {
+              "type": "integer"
+            },
+            "h": {
+              "type": "integer"
+            },
+            "ilvl": {
+              "type": "integer"
+            },
+            "icon": {
+              "type": "text"
+            },
+            "support": {
+              "type": "boolean"
+            },
+            "league": {
+              "type": "text"
+            },
+            "id": {
+              "type": "text"
+            },
+            "sockets": {
+              "properties": {
+                "group": {
+                  "type": "integer"
+                },
+                "attr": {
+                  "type": "text"
+                }
+              }
+            },
+            "name": {
+              "type": "text"
+            },
+            "typeLine": {
+              "type": "text"
+            },
+            "identified": {
+              "type": "boolean"
+            },
+            "corrupted": {
+              "type": "boolean"
+            },
+            "lockedToCharacter": {
+              "type": "boolean"
+            },
+            "note": {
+              "type": "text"
+            },
+            "properties": {
+              "properties": {
+                "name": {
+                  "type": "text"
+                },
+                "displayMode": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "integer"
+                },
+                "values": {
+                  "type": "text"
+                }
+              }
+            },
+            "additionalProperties": {
+              "properties": {
+                "name": {
+                  "type": "text"
+                },
+                "displayMode": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "integer"
+                },
+                "values": {
+                  "type": "text"
+                }
+              }
+            },
+            "requirements": {
+              "properties": {
+                "name": {
+                  "type": "text"
+                },
+                "displayMode": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "integer"
+                },
+                "values": {
+                  "type": "text"
+                }
+              }
+            },
+            "nextLevelRequirements": {
+              "properties": {
+                "name": {
+                  "type": "text"
+                },
+                "displayMode": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "integer"
+                },
+                "values": {
+                  "type": "text"
+                }
+              }
+            },
+            "explicitMods": {
+              "type": "text"
+            },
+            "flavourText": {
+              "type": "text"
+            },
+            "secDescrText": {
+              "type": "text"
+            },
+            "descrText": {
+              "type": "text"
+            },
+            "frameType": {
+              "type": "integer"
+            },
+            "x": {
+              "type": "integer"
+            },
+            "y": {
+              "type": "integer"
+            },
+            "inventoryId": {
+              "type": "text"
+            },
+            "socketedItems": {
+              "properties": {
+                "verified": {
+                  "type": "boolean"
+                },
+                "w": {
+                  "type": "integer"
+                },
+                "h": {
+                  "type": "integer"
+                },
+                "ilvl": {
+                  "type": "integer"
+                },
+                "icon": {
+                  "type": "text"
+                },
+                "support": {
+                  "type": "boolean"
+                },
+                "league": {
+                  "type": "text"
+                },
+                "id": {
+                  "type": "text"
+                },
+                "sockets": {
+                  "properties": {
+                    "group": {
+                      "type": "integer"
+                    },
+                    "attr": {
+                      "type": "text"
+                    }
+                  }
+                },
+                "name": {
+                  "type": "text"
+                },
+                "typeLine": {
+                  "type": "text"
+                },
+                "identified": {
+                  "type": "boolean"
+                },
+                "corrupted": {
+                  "type": "boolean"
+                },
+                "lockedToCharacter": {
+                  "type": "boolean"
+                },
+                "properties": {
+                  "properties": {
+                    "name": {
+                      "type": "text"
+                    },
+                    "displayMode": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "integer"
+                    },
+                    "values": {
+                      "type": "text"
+                    }
+                  }
+                },
+                "additionalProperties": {
+                  "properties": {
+                    "name": {
+                      "type": "text"
+                    },
+                    "displayMode": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "integer"
+                    },
+                    "values": {
+                      "type": "text"
+                    }
+                  }
+                },
+                "requirements": {
+                  "properties": {
+                    "name": {
+                      "type": "text"
+                    },
+                    "displayMode": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "integer"
+                    },
+                    "values": {
+                      "type": "text"
+                    }
+                  }
+                },
+                "nextLevelRequirements": {
+                  "properties": {
+                    "name": {
+                      "type": "text"
+                    },
+                    "displayMode": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "integer"
+                    },
+                    "values": {
+                      "type": "text"
+                    }
+                  }
+                },
+                "explicitMods": {
+                  "type": "text"
+                },
+                "descrText": {
+                  "type": "text"
+                },
+                "frameType": {
+                  "type": "integer"
+                },
+                "socket": {
+                  "type": "integer"
+                },
+                "colour": {
+                  "type": "text"
+                },
+                "socketedItems": {
+                  "type": "text"
+                }
+              }
+            }
+          }
+        },
+        "public": {
+          "type": "boolean"
         }
       }
     }

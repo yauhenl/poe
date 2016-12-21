@@ -34,4 +34,12 @@ public class Stash {
     public static String getLastCharacterName(Document stash) {
         return stash.getString("lastCharacterName");
     }
+
+    public static String getName(Document stash) {
+        return stash.getString("stash");
+    }
+
+    public static StashType getStashType(Document stash) {
+        return StashType.valueOf(stash.getString("stashType"));
+    }
 }
