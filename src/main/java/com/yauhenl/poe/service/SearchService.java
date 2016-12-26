@@ -1,5 +1,6 @@
 package com.yauhenl.poe.service;
 
+import com.yauhenl.poe.domain.JobStatus;
 import org.bson.Document;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
 import org.elasticsearch.client.Client;
@@ -10,11 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -39,12 +42,13 @@ public class SearchService {
     private StashService stashService;
 
     @Async
-    public void reindexProducts() throws IOException {
-        logger.info(elasticSearchClient.toString());
+    public Future<JobStatus> reindexProducts() throws IOException {
         String newIndexName = String.format("newproduct-%d", System.currentTimeMillis());
+        logger.info(newIndexName);
         createIndex(newIndexName);
         processStashes(newIndexName);
         createOrSwitchAlias(indexAliasName, newIndexName);
+        return new AsyncResult<>(JobStatus.done);
     }
 
     private void createIndex(String indexName) throws IOException {

@@ -1,23 +1,23 @@
 package com.yauhenl.poe.service;
 
-import static com.mongodb.client.model.Filters.eq;
-import static com.yauhenl.poe.domain.Stash.*;
-
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
+import com.yauhenl.poe.domain.JobStatus;
+import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.Future;
+
+import static com.mongodb.client.model.Filters.eq;
+import static com.yauhenl.poe.domain.Stash.*;
 
 @Service
 public class StashService extends BaseMongoService {
     private static final String collectionName = "stash";
-    private static final Logger logger = LoggerFactory.getLogger(StashService.class);
 
     @Autowired
     private ApiService apiService;
@@ -38,7 +38,7 @@ public class StashService extends BaseMongoService {
     }
 
     @Async
-    public void updateStashes() {
+    public Future<JobStatus> updateStashes() {
         apiService.getPublicStashTabs().forEach(it -> {
             Document stash = findFirstByProperty("id", getId(it));
             if (stash == null) {
@@ -53,6 +53,6 @@ public class StashService extends BaseMongoService {
                 }
             }
         });
-        logger.info("============================================");
+        return new AsyncResult<>(JobStatus.done);
     }
 }
