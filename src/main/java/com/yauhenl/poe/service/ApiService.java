@@ -55,4 +55,15 @@ public class ApiService extends BaseMongoService {
     private Document findNextChangeId() {
         return mongoCollection.find(exists("next_change_id")).first();
     }
+
+    public Document getPublicStashTabs(String nextChangeId) {
+        String url = publicStashTabs + "/?id=" + nextChangeId;
+        String getResult = get(url, Collections.singletonMap("Content-Encoding", "gzip")).getText();
+        Document data = Document.parse(getResult);
+        if (getError(data) != null) {
+            logger.error("get error", data.toJson());
+            return null;
+        }
+        return data;
+    }
 }

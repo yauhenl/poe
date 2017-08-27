@@ -18,7 +18,7 @@ public class UpdateStashesJob {
     @Autowired
     private StashService stashService;
 
-    @Scheduled(fixedRate = 5000)
+//    @Scheduled(fixedRate = 5000)
     public void updateStashes() throws InterruptedException, ExecutionException {
         Future<JobStatus> result = stashService.updateStashes();
         JobStatus status = result.get();
