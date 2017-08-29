@@ -3,6 +3,8 @@ package com.yauhenl.poe.service;
 import com.mongodb.client.MongoDatabase;
 import com.yauhenl.poe.domain.JobStatus;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -14,6 +16,7 @@ import static com.mongodb.client.model.Sorts.descending;
 
 @Service
 public class PublicStashTabsService extends BaseMongoService {
+    private static final Logger logger = LoggerFactory.getLogger(PublicStashTabsService.class);
 
     private static final String collectionName = "publicStashTabs";
 
@@ -32,6 +35,7 @@ public class PublicStashTabsService extends BaseMongoService {
         Document publicStashTabs = apiService.getPublicStashTabs(nextChangeId);
         if (publicStashTabs != null && !nextChangeId.equals(getNextChangeId(publicStashTabs))) {
             insertOne(publicStashTabs);
+            logger.info(getNextChangeId(publicStashTabs));
         }
         return new AsyncResult<>(JobStatus.done);
     }

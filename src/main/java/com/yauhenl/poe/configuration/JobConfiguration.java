@@ -17,16 +17,18 @@ public class JobConfiguration {
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(25);
+
+        int processors = Runtime.getRuntime().availableProcessors();
+        executor.setCorePoolSize(processors + 1);
+        executor.setMaxPoolSize(processors * 2);
+        executor.setQueueCapacity((int) (processors * 2.5));
         return executor;
     }
 
     @Bean
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler result = new ThreadPoolTaskScheduler();
-        result.setPoolSize(5);
+        result.setPoolSize(Runtime.getRuntime().availableProcessors() + 1);
         return result;
     }
 }
