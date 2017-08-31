@@ -1,6 +1,7 @@
 package com.yauhenl.poe.service;
 
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
 import com.yauhenl.poe.domain.JobStatus;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -23,6 +24,11 @@ public class PublicStashTabsService extends BaseMongoService {
     @Autowired
     public PublicStashTabsService(MongoDatabase mongoDatabase) {
         super(mongoDatabase, collectionName);
+    }
+
+    @Override
+    public void initCollection() {
+        mongoCollection.createIndex(new Document("next_change_id", 1), new IndexOptions().unique(true));
     }
 
     @Autowired
