@@ -2,16 +2,11 @@ package com.yauhenl.poe.service;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
-import com.yauhenl.poe.domain.JobStatus;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.Future;
 
 import static com.mongodb.client.model.Sorts.descending;
 
@@ -26,16 +21,15 @@ public class PublicStashTabsService extends BaseMongoService {
         super(mongoDatabase, collectionName);
     }
 
+    @Autowired
+    private ApiService apiService;
+
     @Override
     public void initCollection() {
         mongoCollection.createIndex(new Document("next_change_id", 1), new IndexOptions().unique(true));
     }
 
-    @Autowired
-    private ApiService apiService;
-
-    @Async
-    public Future<JobStatus> writeNext() {
+    public void writeNext() {
         Document last = mongoCollection.find().sort(descending("_id")).limit(1).first();
         String nextChangeId = last == null ? "0" : getNextChangeId(last);
         Document publicStashTabs = apiService.getPublicStashTabs(nextChangeId);
@@ -43,7 +37,6 @@ public class PublicStashTabsService extends BaseMongoService {
             insertOne(publicStashTabs);
             logger.info(getNextChangeId(publicStashTabs));
         }
-        return new AsyncResult<>(JobStatus.done);
     }
 
     public String getNextChangeId(Document document) {

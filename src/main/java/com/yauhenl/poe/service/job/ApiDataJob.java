@@ -13,7 +13,7 @@ public class ApiDataJob {
     private PublicStashTabsService publicStashTabsService;
 
     @Scheduled(fixedRate = 5000)
-    public void updatePublicStashTabs() throws ExecutionException, InterruptedException {
+    public void updatePublicStashTabs() {
         publicStashTabsService.writeNext();
     }
 }
