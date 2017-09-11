@@ -12,7 +12,7 @@ public class ApiDataJob {
     @Autowired
     private PublicStashTabsService publicStashTabsService;
 
-    @Scheduled(fixedRate = 5000)
+//    @Scheduled(fixedRate = 5000)
     public void updatePublicStashTabs() {
         publicStashTabsService.writeNext();
     }

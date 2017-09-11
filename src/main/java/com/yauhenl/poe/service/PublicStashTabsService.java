@@ -6,6 +6,7 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import static com.mongodb.client.model.Sorts.descending;
@@ -29,6 +30,7 @@ public class PublicStashTabsService extends BaseMongoService {
         mongoCollection.createIndex(new Document("next_change_id", 1), new IndexOptions().unique(true));
     }
 
+    @Async
     public void writeNext() {
         Document last = mongoCollection.find().sort(descending("_id")).limit(1).first();
         String nextChangeId = last == null ? "0" : getNextChangeId(last);
