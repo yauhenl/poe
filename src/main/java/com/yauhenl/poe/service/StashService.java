@@ -1,62 +1,31 @@
 package com.yauhenl.poe.service;
 
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.IndexOptions;
-import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.bson.Document;
 
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static khttp.KHttp.get;
 
 @Service
-public class StashService extends BaseMongoService {
-    private static final String collectionName = "stashes";
+public class StashService {
 
-    @Autowired
-    private PublicStashTabsService publicStashTabsService;
+    @Value("${url.getStashItems}")
+    private String getStashItemsUrl;
 
-    public StashService(MongoDatabase mongoDatabase) {
-        super(mongoDatabase, collectionName);
-    }
-
-    @Override
-    public void initCollection() {
-        mongoCollection.createIndex(new Document("id", 1), new IndexOptions().unique(true));
-    }
-
-    public void parseData(int pageNumber, int pageSize) {
-        FindIterable<Document> documents = publicStashTabsService.find().skip(pageNumber * pageSize).limit(pageSize);
-        documents.forEach((Consumer<? super Document>) publicStashTab -> getStashes(publicStashTab).stream().filter(this::isPublic).forEach(stash -> {
-            Document existStash = findByStashId(getStashId(stash));
-            if (existStash != null) {
-                stash.put("_id", existStash.get("_id"));
-                replaceOne(stash);
-            } else {
-                insertOne(stash);
-            }
-        }));
-    }
-
-    public Document findByStashId(String stashId) {
-        return findFirstByProperty("id", stashId);
-    }
-
-    public List<Document> getStashes(Document document) {
-        return document.get("stashes", List.class);
-    }
-
-    public Boolean isPublic(Document document) {
-        return document.getBoolean("public");
-    }
-
-    public List<Document> getItems(Document document) {
-        return document.get("items", List.class);
-    }
-
-    public String getStashId(Document document) {
-        return document.getString("id");
+    public void getStashes() {
+        Map<String, String> params = new HashMap<>();
+        params.put("accountName", "yauhel");
+        params.put("tabIndex", "6");
+        params.put("league", "Delve");
+        params.put("tabs", "0");
+        Map<String, String> cookies = new HashMap<>();
+        cookies.put("POESESSID", "ec9bcdf27bcb455854170b8cb0f0040a");
+        String getResult = get(getStashItemsUrl, Collections.singletonMap("Content-Encoding", "gzip"), params, null, null, null, cookies).getText();
+        Document data = Document.parse(getResult);
+        System.out.println(data);
     }
 }
